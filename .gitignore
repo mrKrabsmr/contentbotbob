@@ -1,0 +1,5 @@
+.idea
+migrations
+venv
+.env
+db.sqlite3

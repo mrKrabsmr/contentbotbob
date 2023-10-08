@@ -1,0 +1,25 @@
+msgid ""
+msgstr ""
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "\
+the password does not meet the requirements:\n\
+- The password must contain at least one lowercase letter and at least one uppercase letter.\n\
+- The password must contain at least one digit.\n\
+- The password must be at least 8 characters long.\n\
+- The password must contain at least one special character from the list @$!%*?&."
+msgstr "\
+пароль не соответствует требованиям:\n\
+- Пароль должен содержать хотя бы одну строчную букву и хотя бы одну заглавную букву.\n\
+- Пароль должен содержать хотя бы одну цифру.\n\
+- Пароль должен быть не менее 8 символов длиной.\n\
+- Пароль должен содержать хотя бы один специальный символ из списка @$!%*?&."
+
+msgid "incorrect email"
+msgstr "неккоректный адресс электронной почты"
+
+msgid "write the code that you received by email"
+msgstr "напишите код, который пришел вам на почту"

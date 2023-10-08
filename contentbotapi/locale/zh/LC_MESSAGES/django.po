@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Language: zh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+msgid "\
+the password does not meet the requirements:\n\
+- The password must contain at least one lowercase letter and at least one uppercase letter.\n\
+- The password must contain at least one digit.\n\
+- The password must be at least 8 characters long.\n\
+- The password must contain at least one special character from the list @$!%*?&."
+msgstr "\
+密码不符合要求：\n\
+- 密码必须包含至少一个小写字母和至少一个大写字母。\n\
+- 密码必须包含至少一个数字。\n\
+- 密码长度必须至少为8个字符。\n\
+- 密码必须包含列表中的至少一个特殊字符 @$!%*?&。"
+
+msgid "incorrect email"
+msgstr "不正確的電子郵件"
+
+msgid "write the code that you received by email"
+msgstr "编写您通过电子邮件收到的代码"
