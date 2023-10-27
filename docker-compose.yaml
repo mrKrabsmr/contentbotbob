@@ -29,3 +29,25 @@ services:
       - ./contentbotparser/:/pars/
     environment:
       - API_SERVER=http://api-server:8000/api/
+  tg_bot:
+    build:
+      context: ./contentbottelegram/
+    container_name: tg-bot
+    restart: always
+    ports:
+      - "7000:7000"
+    command: >
+      bash -c
+      "go run cmd/main.go"
+    volumes:
+      - ./contentbottelegram/:/tg-bot/
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+
+
+
