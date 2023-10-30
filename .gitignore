@@ -4,3 +4,6 @@ venv
 .env
 db.sqlite3
 __pycache__
+config.yaml
+go.mod
+go.sum
