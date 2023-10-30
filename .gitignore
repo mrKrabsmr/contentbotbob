@@ -4,6 +4,6 @@ venv
 .env
 db.sqlite3
 __pycache__
-contentbottelegram/config.yaml
-*go.mod
-*go.sum
+config.yaml
+go.mod
+go.sum
