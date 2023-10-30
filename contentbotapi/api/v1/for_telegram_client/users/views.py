@@ -1,8 +1,13 @@
+import datetime
+import http
+
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from apps.subscribes.serializers import SubscribeSerializer, UserSubscribeSerializer
+from apps.subscribes.services import UserSubscribeService as US_s
 from apps.text import text_messages
 from apps.users.models import User
 from apps.users.serializers import RegisterSerializer, LoginSerializer
@@ -18,9 +23,9 @@ class RegisterAPIView(APIView):
             serializer.save()
             UCA_s.create_or_change_activation_code(serializer.instance)
 
-            return Response({"message": text_messages["sent_email"]})
+            return Response({"message": text_messages["sent_email"]}, http.HTTPStatus.CREATED)
 
-        return Response(serializer.errors, 400)
+        return Response(serializer.errors, http.HTTPStatus.BAD_REQUEST)
 
 
 class LoginAPIView(APIView):
@@ -28,15 +33,19 @@ class LoginAPIView(APIView):
         serializer = LoginSerializer(data=request.data)
 
         if serializer.is_valid():
-            user = User.objects.get(username=serializer["username"])
+            user = User.objects.filter(username=serializer.data["username"]).first()
             if user and user.check_password(serializer.data["password"]):
                 token = RefreshToken.for_user(user)
-                serializer.data["access_token"] = str(token.access_token)
-                serializer.data["refresh_token"] = str(token)
 
-                return Response(serializer.data, 200)
-            return Response({"message": "invalid data"}, 403)
-        return Response(serializer.errors, 400)
+                data = {
+                    **serializer.data,
+                    "access_token": str(token.access_token),
+                    "refresh_token": str(token)
+                }
+
+                return Response(data, http.HTTPStatus.OK)
+            return Response({"message": "user not found"}, http.HTTPStatus.NOT_FOUND)
+        return Response(serializer.errors, http.HTTPStatus.BAD_REQUEST)
 
 
 class SendActivateCodeAPIView(APIView):
@@ -54,5 +63,34 @@ class UserActivateAPIView(APIView):
             activation_code.user.save()
             activation_code.delete()
 
-            return Response({"message": "success"}, 200)
-        return Response({"message": "activation code not found"}, 404)
+            return Response({"message": "success"}, http.HTTPStatus.OK)
+        return Response({"message": "activation code not found"}, http.HTTPStatus.NOT_FOUND)
+
+
+class ProfileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        data = {
+            "username": request.user.username,
+            "email": request.user.email,
+            "registered_at": request.user.date_joined,
+            "subscribe": None
+        }
+
+        user_subscribe = US_s.get_user_subscribe(request.user)
+        if user_subscribe:
+            subscribe_serializer = SubscribeSerializer(user_subscribe.subscribe)
+            user_subscribe_serialzier = UserSubscribeSerializer(user_subscribe)
+
+            remains_until = (datetime.timedelta(days=subscribe_serializer.data["period_in_days"])
+                             - (datetime.date.today().day - user_subscribe_serialzier.data["bought_at"])).days
+
+            sub_data = {
+                "name": subscribe_serializer.data["name"],
+                "remains_until_days": remains_until,
+            }
+
+            data["subscribe"] = sub_data
+
+        return Response(data, http.HTTPStatus.OK)

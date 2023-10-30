@@ -22,7 +22,7 @@ class UserSubscribe(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(to=User, on_delete=models.CASCADE, related_name="subscribe")
     subscribe = models.ForeignKey(to=Subscribe, on_delete=models.SET_NULL, related_name="user", null=True)
-    bought_on = models.DateTimeField(auto_now_add=True)
+    bought_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "users_subscribes"

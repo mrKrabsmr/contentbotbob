@@ -1,3 +1,13 @@
 from django.contrib import admin
 
-# Register your models here.
+from apps.contents.models import ContentMedia, Content
+
+
+class ContentMediaInline(admin.TabularInline):
+    model = ContentMedia
+    extra = 1
+
+
+@admin.register(Content)
+class CotentAdmin(admin.ModelAdmin):
+    inlines = (ContentMediaInline,)

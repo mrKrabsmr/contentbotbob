@@ -1,7 +1,7 @@
 package regulators
 
-import "github.com/mrkrabsmr/contentbotparser/config"
+import "github.com/mrkrabsmr/contentbotparser/configs"
 
 type Regulator struct {
-	Config *config.Config
+	Config *configs.Config
 }

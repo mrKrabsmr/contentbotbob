@@ -1,5 +1,3 @@
-from pydantic import dataclasses
-
 from apps.users.models import UserCodeActivation
 from apps.users.utils import get_activation_code
 

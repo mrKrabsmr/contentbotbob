@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	config2 "github.com/mrkrabsmr/contentbotparser/config"
+	"github.com/mrkrabsmr/contentbotparser/configs"
 	"github.com/mrkrabsmr/contentbotparser/internal/regulators"
 	"log"
 	"os"
@@ -15,7 +15,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	config := config2.Config{
+	config := configs.Config{
 		ApiServer: os.Getenv("API_SERVER"),
 	}
 

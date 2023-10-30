@@ -1,8 +1,7 @@
-from apps.services import ServiceCore
 from apps.subscribes.models import Subscribe, UserSubscribe
 
 
-class SubscribeService(ServiceCore):
+class SubscribeService:
     _queryset = Subscribe.objects.all()
 
     @classmethod
@@ -10,8 +9,13 @@ class SubscribeService(ServiceCore):
         return cls._queryset.filter(id=sub_id).first()
 
 
-class UserSubscribeService(ServiceCore):
+class UserSubscribeService:
     _queryset = UserSubscribe.objects.all()
+
+    @classmethod
+    def get_user_subscribe(cls, user):
+        user_subscribe = cls._queryset.filter(user=user).first()
+        return user_subscribe
 
     @classmethod
     def check_user_already_have_subscibe(cls, user):

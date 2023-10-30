@@ -8,14 +8,17 @@ import (
 )
 
 func NewsAPIRequest(apiUrl string, data []parsers.ParsContent) error {
-	endpoint := "parser/content/news/"
+	endpoint := "/parser/contents/news/"
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
-	http.Post(apiUrl+endpoint, "application/json", bytes.NewReader(jsonData))
+	_, err = http.Post(apiUrl+endpoint, "application/json", bytes.NewReader(jsonData))
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

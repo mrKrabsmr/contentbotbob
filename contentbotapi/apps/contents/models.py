@@ -18,8 +18,8 @@ class Content(models.Model):
 
     class Meta:
         db_table = "channel_contents"
-        verbose_name = "Каналы-Контент"
-        verbose_name_plural = "Каналы-Контенты"
+        verbose_name = "Контент"
+        verbose_name_plural = "Контенты"
         ordering = ("-created_at", "rating")
 
     def __str__(self):
@@ -35,8 +35,8 @@ class ContentMedia(models.Model):
 
     class Meta:
         db_table = "channel_content_files"
-        verbose_name = "Каналы-Контент-Медиа"
-        verbose_name_plural = "Каналы-Контент-Медиа"
+        verbose_name = "Контент-Медиа"
+        verbose_name_plural = "Контент-Медиа"
 
     def __str__(self):
         return str(self.channel_content)

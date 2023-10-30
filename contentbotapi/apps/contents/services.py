@@ -2,10 +2,9 @@ from django.db.transaction import atomic
 
 from apps.channels.services import ChannelService as Ch_s
 from apps.contents.models import Content, ContentMedia
-from apps.services import ServiceCore, ServiceMediaCore
 
 
-class ContentService(ServiceCore):
+class ContentService:
     _queryset = Content.objects.all()
 
     @classmethod
@@ -23,7 +22,7 @@ class ContentService(ServiceCore):
         return suitable_content
 
 
-class ContentDistributionService(ServiceMediaCore):
+class ContentDistributionService:
     _queryset = Content.objects.all()
     _media_queryset = ContentMedia.objects.all()
 
@@ -42,8 +41,8 @@ class ContentDistributionService(ServiceMediaCore):
             contents.append(content)
             content_images.append(content_image)
 
-        cls._queryset.objects.bulk_create(contents)
-        cls._media_queryset.objects.bulk_create(content_images)
+        cls._queryset.bulk_create(contents)
+        cls._media_queryset.bulk_create(content_images)
 
     @staticmethod
     def _filter_channels(data):

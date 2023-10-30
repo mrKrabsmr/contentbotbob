@@ -27,8 +27,6 @@ services:
       "go run cmd/main.go"
     volumes:
       - ./contentbotparser/:/pars/
-    environment:
-      - API_SERVER=http://api-server:8000/api/
   tg_bot:
     build:
       context: ./contentbottelegram/

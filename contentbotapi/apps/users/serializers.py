@@ -7,7 +7,7 @@ from apps.users.models import User
 
 
 class LoginSerializer(Serializer):
-    login = serializers.CharField()
+    username = serializers.CharField()
     password = serializers.CharField()
 
 

@@ -2,7 +2,7 @@
 Описание моделей, связанных с пользователями
 @version 1.0
 """
-
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -27,6 +27,11 @@ class User(ModelCore, AbstractUser):
 
     first_name = None
     last_name = None
+
+    def save(self, *args, **kwargs):
+        if self._state.adding or self.password != self.__class__.objects.get(pk=self.pk).password:
+            self.password = make_password(self.password)
+        return super().save(*args, **kwargs)
 
 
 class UserCodeActivation(ModelCore):

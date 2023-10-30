@@ -1,0 +1,12 @@
+version: "3"
+
+bot_token: 6689228840:AAEwOwbhrMbyWxuYNcGP-UeEdOsq6iqcVNc
+address:
+log_level: info
+debug: no
+redis:
+  host: "redis"
+  port: "6379"
+  db: 1
+backend:
+  address: "http://api-server:8000/api/v1"
