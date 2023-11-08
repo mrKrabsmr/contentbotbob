@@ -9,7 +9,8 @@ class Subscribe(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    period_in_days = models.PositiveIntegerField(default=30)
+    # period_in_days = models.PositiveIntegerField(default=30, null=True, blank=True)
+    max_use_channels = models.PositiveSmallIntegerField()
     price_rub = models.DecimalField(default=0.0, decimal_places=2, max_digits=8)
 
     class Meta:
@@ -28,5 +29,5 @@ class UserSubscribe(models.Model):
         db_table = "users_subscribes"
         verbose_name = "подписка пользователя"
         verbose_name_plural = "подписки пользователей"
-        ordering = ("bought_on",)
+        ordering = ("-bought_at",)
 

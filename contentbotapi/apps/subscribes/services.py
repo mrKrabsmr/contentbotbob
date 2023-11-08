@@ -5,6 +5,10 @@ class SubscribeService:
     _queryset = Subscribe.objects.all()
 
     @classmethod
+    def get_all(cls):
+        return cls._queryset
+
+    @classmethod
     def get_subscribe(cls, sub_id):
         return cls._queryset.filter(id=sub_id).first()
 
@@ -27,3 +31,4 @@ class UserSubscribeService:
             user=user,
             subscribe=sub
         )
+

@@ -17,10 +17,14 @@ class ChannelSerializer(ModelSerializer):
         model = Channel
         fields = "__all__"
 
+    def _get_user(self):
+        return self.context.get("request").user
+
     @atomic
     def create(self, validated_data):
         settings = validated_data.pop("settings")
-        channel = Channel.objects.create(**validated_data)
+        user = self._get_user()
+        channel = Channel.objects.create(**validated_data, owner=user)
         ChannelSettings.objects.create(channel=channel, **settings)
 
         return channel

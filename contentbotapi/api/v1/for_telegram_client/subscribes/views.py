@@ -8,19 +8,22 @@ from apps.subscribes.services import SubscribeService as S_s, UserSubscribeServi
 from apps.users.permissions import IsConfirmed
 
 
-class ActivateSubscribeAPIView(APIView):
+class SubscribeAPIView(APIView):
     permission_classes = [IsAuthenticated, IsConfirmed]
+
+    def get(self, request, *args, **kwargs):
+        return S_s.get_all()
 
     def post(self, request, *args, **kwargs):
         user = request.user
         sub_id = request.data.get("subscribe_id")
         sub = S_s.get_subscribe(sub_id)
         if not sub:
-            return Response({"no matching subscribe"}, http.HTTPStatus.NOT_FOUND)
+            return Response({"message": "подписка не найдена"}, http.HTTPStatus.NOT_FOUND)
 
         if US_s.check_user_already_have_subscibe(user):
-            return Response({"user already have a subscribe"}, http.HTTPStatus.BAD_REQUEST)
+            return Response({"message": "у вас уже есть подписка"}, http.HTTPStatus.BAD_REQUEST)
 
         US_s.activate_user_subscribe(user, sub)
 
-        return Response("successful activation", http.HTTPStatus.CREATED)
+        return Response({"message": "подписка уже активирована"}, http.HTTPStatus.CREATED)

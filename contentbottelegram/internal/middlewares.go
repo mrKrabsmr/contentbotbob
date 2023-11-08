@@ -5,16 +5,26 @@ import (
 )
 
 func (b *Bot) JWTAuthentication(update *tgbotapi.Update, context *map[string]interface{}) bool {
-	if b.Filter(update.Message, b.IsPrivate, b.IsNotAuth, b.IsNotInState) {
-		userTgId := update.Message.From.ID
-		access, refresh, err := b.redis.GetTokens(userTgId)
+	var message *tgbotapi.Message
+	var userTgID int64
+
+	if update.Message != nil {
+		message = update.Message
+		userTgID = update.Message.From.ID
+	} else if update.CallbackQuery != nil {
+		message = update.CallbackQuery.Message
+		userTgID = update.CallbackQuery.From.ID
+	}
+
+	if b.Filter(message, b.IsPrivate, b.IsNotAuth, b.IsNotInState) {
+		access, refresh, err := b.redis.GetTokens(userTgID)
 		if err != nil {
 			b.logger.Error("***middleware JWTAuthentication (get token)", err)
 			return false
 		}
 
 		if refresh == "" {
-			b.handleNeedAuth(update.Message)
+			b.handleNeedAuth(message)
 			return false
 		}
 
@@ -25,7 +35,7 @@ func (b *Bot) JWTAuthentication(update *tgbotapi.Update, context *map[string]int
 				return false
 			}
 
-			if err = b.redis.SetAccessToken(userTgId, resp.AccessToken); err != nil {
+			if err = b.redis.SetAccessToken(userTgID, resp.AccessToken); err != nil {
 				b.logger.Error("***middleware JWTAuthentication (set access token)", err)
 				return false
 			}

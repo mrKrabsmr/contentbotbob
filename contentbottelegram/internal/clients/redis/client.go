@@ -89,3 +89,12 @@ func (c *Client) DeleteTokens(userId int64) error {
 
 	return nil
 }
+
+func (c *Client) SetPostFormat(chanId string, toChannel bool) error {
+	_, err := c.Set(context.Background(), chanId, toChannel, 0).Result()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

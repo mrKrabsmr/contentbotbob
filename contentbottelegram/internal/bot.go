@@ -23,12 +23,14 @@ func NewBot(config *configs.Config) (*Bot, error) {
 		return nil, err
 	}
 
+	logger := logrus.New()
+
 	return &Bot{
 		config:  config,
-		logger:  logrus.New(),
+		logger:  logger,
 		bot:     botAPI,
 		redis:   redis.NewClient(config.Redis),
-		api:     backend.NewAPIClient(config.Backend),
+		api:     backend.NewAPIClient(config.Backend, logger),
 		storage: make(map[int64]State),
 	}, nil
 }

@@ -44,7 +44,7 @@ class LoginAPIView(APIView):
                 }
 
                 return Response(data, http.HTTPStatus.OK)
-            return Response({"message": "user not found"}, http.HTTPStatus.NOT_FOUND)
+            return Response({"message": "пользователь с такими данными не найден"}, http.HTTPStatus.NOT_FOUND)
         return Response(serializer.errors, http.HTTPStatus.BAD_REQUEST)
 
 
@@ -74,21 +74,17 @@ class ProfileAPIView(APIView):
         data = {
             "username": request.user.username,
             "email": request.user.email,
-            "registered_at": request.user.date_joined,
+            "registered_at": request.user.date_joined.date(),
             "subscribe": None
         }
 
         user_subscribe = US_s.get_user_subscribe(request.user)
         if user_subscribe:
             subscribe_serializer = SubscribeSerializer(user_subscribe.subscribe)
-            user_subscribe_serialzier = UserSubscribeSerializer(user_subscribe)
-
-            remains_until = (datetime.timedelta(days=subscribe_serializer.data["period_in_days"])
-                             - (datetime.date.today().day - user_subscribe_serialzier.data["bought_at"])).days
 
             sub_data = {
                 "name": subscribe_serializer.data["name"],
-                "remains_until_days": remains_until,
+                "max_use_channels": subscribe_serializer.data["max_use_channels"],
             }
 
             data["subscribe"] = sub_data

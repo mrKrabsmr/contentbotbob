@@ -8,7 +8,7 @@ from apps.users.models import User
 
 
 class Channel(ModelCore):
-    owner = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="channels")
+    owner = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="channels", blank=True)
     name = models.CharField(max_length=255)
     type = models.CharField(
         max_length=255, choices=[(i, i) for i in settings.CHANNEL_TYPE_LIST]
@@ -17,6 +17,7 @@ class Channel(ModelCore):
         max_length=255, choices=[(i, i) for i in settings.RESOURCE_LIST]
     )
     outer_id = models.CharField(max_length=255)
+    status_on = models.BooleanField(default=True)
 
     class Meta:
         db_table = "channels"
@@ -29,7 +30,7 @@ class Channel(ModelCore):
 
 class ChannelSettings(ModelCore):
     channel = models.OneToOneField(
-        to=Channel, on_delete=models.CASCADE, related_name="settings"
+        to=Channel, on_delete=models.CASCADE, related_name="settings", blank=True
     )
     min_rating = models.IntegerField(
         null=True, blank=True, choices=[(i, i) for i in range(1, 11)], default=1
@@ -37,7 +38,6 @@ class ChannelSettings(ModelCore):
     empty_file_allowed = models.BooleanField(default=True)
     not_later_days = models.IntegerField(default=3)
     language = models.CharField(max_length=255, choices=[(i, i) for i in settings.CONTENT_LANGUAGES_LIST])
-    status_on = models.BooleanField(default=True)
 
     class Meta:
         db_table = "channel_settings"
