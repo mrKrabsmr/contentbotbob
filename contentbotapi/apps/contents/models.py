@@ -3,10 +3,10 @@ import uuid
 from django.db import models
 
 from apps.channels.models import Channel
+from apps.models import ModelCore
 
 
-class Content(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+class Content(ModelCore):
     channel = models.ForeignKey(
         to=Channel, on_delete=models.CASCADE, related_name="contents"
     )
@@ -26,9 +26,8 @@ class Content(models.Model):
         return self.text[:25] + "..."
 
 
-class ContentMedia(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    channel_content = models.ForeignKey(
+class ContentMedia(ModelCore):
+    content = models.ForeignKey(
         to=Content, on_delete=models.CASCADE, related_name="images"
     )
     file_url = models.CharField(max_length=255, null=True, blank=True)
@@ -39,4 +38,4 @@ class ContentMedia(models.Model):
         verbose_name_plural = "Контент-Медиа"
 
     def __str__(self):
-        return str(self.channel_content)
+        return str(self.content)

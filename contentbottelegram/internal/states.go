@@ -29,10 +29,10 @@ func (s *StateRegister) PerformAdd(message *tgbotapi.Message) (bool, string) {
 	switch {
 	case s.reflectObj.Username == "":
 		s.reflectObj.Username = message.Text
-		return true, "введите email"
+		return true, txtSetEmail
 	case s.reflectObj.Email == "":
 		s.reflectObj.Email = message.Text
-		return true, "введите пароль"
+		return true, txtSetPassword
 	case s.reflectObj.Password == "":
 		s.reflectObj.Password = message.Text
 		return false, ""
@@ -59,7 +59,7 @@ func (s *StateLogin) PerformAdd(message *tgbotapi.Message) (bool, string) {
 	switch {
 	case s.reflectObj.Username == "":
 		s.reflectObj.Username = message.Text
-		return true, "введите пароль:"
+		return true, txtSetPassword
 	case s.reflectObj.Password == "":
 		s.reflectObj.Password = message.Text
 		return false, ""
@@ -71,6 +71,7 @@ func (s *StateLogin) PerformAdd(message *tgbotapi.Message) (bool, string) {
 type StateAddChannel struct {
 	reflectObj     *backend.ChannelCreateRequest
 	PostToChannels *bool
+	Period         *int
 	Access         string
 }
 
@@ -89,44 +90,66 @@ func (s *StateAddChannel) PerformAdd(message *tgbotapi.Message) (bool, string) {
 	switch {
 	case s.reflectObj.Name == "":
 		s.reflectObj.Name = message.Text
-		return true, "введите тип канала (тематика). Сейчас поддерживаются 'crypto', 'history', 'sport'"
+		return true, txtChannelTypesAllowed()
 	case s.reflectObj.Type == "":
-		if message.Text != "crypto" && message.Text != "history" && message.Text != "sport" {
-			return true, "Вы ввели неподдерживаемую тематику!"
+		ok := false
+		for _, element := range useChanTypes {
+			if element == message.Text {
+				ok = true
+			}
+		}
+
+		if !ok {
+			return true, txtUnSupportType
 		}
 		s.reflectObj.Type = message.Text
-		return true, "Введите id вашего канала. Внимание! поменять его потом не получится, введите правильный id"
+		return true, txtSetId
 	case s.reflectObj.OuterID == "":
+		r := []rune(message.Text)
+		if len(r) > 15 {
+			return true, txtIncorrectId
+		}
 		s.reflectObj.OuterID = message.Text
-		return true, "Приступаем к настройкам. Их можно потом поменять. Введите минимальный рейтинг контента от 1 до 10, который разрешается публиковать в вашем канале"
+		return true, txtSetMinRating
 	case s.reflectObj.Settings.MinRating == 0:
 		minRating, err := strconv.Atoi(message.Text)
 		if err != nil {
 			return true, txtErrMinRating
 		}
 		if minRating < 1 || minRating > 10 {
-			return true, "Значение должно быть в диапазоне от 1 до 10"
+			return true, txtErrMinRating2
 		}
 		s.reflectObj.Settings.MinRating = minRating
-		return true, "Введите число, количество дней спустя которые контент уже не подлежит публикации в ваш канал. По умолчанию 3 дня"
+		return true, txtSetNotLaterDays
 	case s.reflectObj.Settings.NotLaterDays == 0:
 		notLaterDays, err := strconv.Atoi(message.Text)
 		if err != nil {
 			return true, txtErrNotLaterDays
 		}
 		if notLaterDays == 0 {
-			return true, "Значение не может быть равным нулю"
+			return true, txtErrNotLaterDays2
 		}
 		s.reflectObj.Settings.NotLaterDays = notLaterDays
-		return true, "Введите язык для постов. Сейчас поддерживается только 'ru'"
+		return true, txtSetLanguage
 	case s.reflectObj.Settings.Language == "":
 		if message.Text != "ru" {
-			return true, "Вы ввели неподдерживаемый язык контента"
+			return true, txtErrLanguage
 		}
 		s.reflectObj.Settings.Language = message.Text
-		return true, txtPostFormatChoice
+		return true, txtSetPeriod
+	case s.Period == nil:
+		period, err := strconv.Atoi(message.Text)
+		if err != nil {
+			return true, txtErrPeriod
+		}
+		if period < 10 {
+			return true, txtErrPeriod2
+		}
+		s.Period = new(int)
+		*s.Period = period
+		return true, txtSetPostFormatChoice
 	case s.PostToChannels == nil:
-		txt := "Введите разрешен ли контент без картинок. (да/нет)"
+		txt := txtSetAllowedFileEmpty
 		if message.Text == "0" {
 			s.PostToChannels = new(bool)
 			*s.PostToChannels = true
@@ -136,19 +159,158 @@ func (s *StateAddChannel) PerformAdd(message *tgbotapi.Message) (bool, string) {
 			*s.PostToChannels = false
 			return true, txt
 		} else {
-			return true, "Введите либо 0, либо 1"
+			return true, txtErrPostToChannels
 		}
 	case !s.reflectObj.Settings.EmptyFileAllowed:
-		if message.Text != "да" {
+		if message.Text == "да" {
 			s.reflectObj.Settings.EmptyFileAllowed = true
 			return false, ""
-		} else if message.Text != "нет" {
+		} else if message.Text == "нет" {
 			s.reflectObj.Settings.EmptyFileAllowed = false
 			return false, ""
 		} else {
-			return true, "Введите 'да' или 'нет'"
+			return true, txtErrAllowedFileEmpty
 		}
 	default:
 		return false, ""
 	}
+}
+
+type StateActivateCode struct {
+	reflectObj *backend.UserEmailActivateRequest
+	Access     string
+}
+
+func NewStateActivationCode(access string) *StateActivateCode {
+	return &StateActivateCode{
+		reflectObj: &backend.UserEmailActivateRequest{},
+		Access:     access,
+	}
+}
+
+func (s *StateActivateCode) GetReflectionObject() interface{} {
+	return s.reflectObj
+}
+
+func (s *StateActivateCode) PerformAdd(message *tgbotapi.Message) (bool, string) {
+	switch {
+	case s.reflectObj.Code == "":
+		s.reflectObj.Code = message.Text
+		return false, ""
+	default:
+		return false, ""
+	}
+}
+
+type StateAPIChannelSettingsChange struct {
+	reflectObj *backend.ChannelSettingsChangeRequest
+	Access     string
+}
+
+func NewStateAPIChannelSettingsChange(access string) *StateAPIChannelSettingsChange {
+	return &StateAPIChannelSettingsChange{
+		reflectObj: &backend.ChannelSettingsChangeRequest{
+			Data: make(map[string]interface{}),
+		},
+		Access: access,
+	}
+}
+
+func (s *StateAPIChannelSettingsChange) GetReflectionObject() interface{} {
+	return s.reflectObj
+}
+
+func (s *StateAPIChannelSettingsChange) PerformAdd(message *tgbotapi.Message) (bool, string) {
+	for x := range s.reflectObj.Data {
+		switch x {
+		case "min_rating":
+			minRating, err := strconv.Atoi(message.Text)
+			if err != nil {
+				return true, txtErrMinRating
+			}
+			if minRating < 1 || minRating > 10 {
+				return true, txtErrMinRating2
+			}
+			s.reflectObj.Data[x] = minRating
+			break
+		case "not_later_days":
+			notLaterDays, err := strconv.Atoi(message.Text)
+			if err != nil {
+				return true, txtErrNotLaterDays
+			}
+			if notLaterDays == 0 {
+				return true, txtErrNotLaterDays2
+			}
+			s.reflectObj.Data[x] = notLaterDays
+			break
+		case "empty_file_allowed":
+			if message.Text == "да" {
+				s.reflectObj.Data[x] = true
+				break
+			} else if message.Text == "нет" {
+				s.reflectObj.Data[x] = false
+				break
+			} else {
+				return true, txtErrAllowedFileEmpty
+			}
+		case "language":
+			if message.Text != "ru" {
+				return true, txtErrLanguage
+			}
+			s.reflectObj.Data[x] = message.Text
+			break
+		}
+
+		break
+	}
+
+	return false, ""
+}
+
+type StateClientChannelSettingsChange struct {
+	reflectObj map[string]interface{}
+	ID         string
+	Access     string
+}
+
+func NewStateClientAPIChannelSettingsChange(access string) *StateClientChannelSettingsChange {
+	return &StateClientChannelSettingsChange{
+		reflectObj: make(map[string]interface{}),
+		Access:     access,
+	}
+}
+
+func (s *StateClientChannelSettingsChange) GetReflectionObject() interface{} {
+	return s.reflectObj
+}
+
+func (s *StateClientChannelSettingsChange) PerformAdd(message *tgbotapi.Message) (bool, string) {
+	for x := range s.reflectObj {
+		switch x {
+		case "period":
+			period, err := strconv.Atoi(message.Text)
+			if err != nil {
+				return true, txtErrPeriod
+			}
+			if period < 10 {
+				return true, txtErrPeriod2
+			}
+			s.reflectObj[x] = period
+			break
+		case "post_to_channels":
+			if message.Text == "да" {
+				s.reflectObj[x] = true
+				break
+			} else if message.Text == "нет" {
+				s.reflectObj[x] = false
+				break
+			} else {
+				return true, txtErrAllowedFileEmpty
+			}
+		}
+
+		break
+	}
+
+	return false, ""
 }

@@ -7,6 +7,8 @@ type Config struct {
 	LogLevel string `yaml:"log_level"`
 	Debug    bool   `yaml:"debug"`
 
+	SecretNum int `yaml:"secret_num"`
+
 	Backend *APIClientConfig `yaml:"backend"`
 	Redis   *RedisConfig     `yaml:"redis"`
 }

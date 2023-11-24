@@ -1,3 +1,5 @@
+import http
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -11,5 +13,5 @@ class NewsContentAPIView(APIView):
         if serializer.is_valid():
             for data in serializer.data:
                 CD_s.saving_data(data)
-            return Response({"message": "success"}, 201)
-        return Response(serializer.errors, 400)
+            return Response({"message": "success"}, http.HTTPStatus.CREATED)
+        return Response(serializer.errors, http.HTTPStatus.BAD_REQUEST)

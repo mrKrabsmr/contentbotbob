@@ -107,6 +107,17 @@ USE_I18N = False
 
 USE_TZ = True
 
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 2525
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = os.getenv("EMAIL_LOGIN")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD")
+
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
@@ -117,9 +128,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
 
-CHANNEL_TYPE_LIST = ["crypto", "sport", "history"]
-
-CONTENT_SOURCE_LIST = ["investing.com", "rg.ru"]
+CHANNEL_TYPE_LIST = [
+    "all",
+    "crypto",
+    "films",
+    "animals",
+    "sport",
+    "football",
+    "basketball",
+    "volleyball",
+    "tennis",
+    "boxing",
+    "auto",
+    "figureskating",
+    "hockey",
+]
 
 CONTENT_LANGUAGES_LIST = ["ru"]
 

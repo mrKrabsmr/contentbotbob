@@ -16,7 +16,7 @@ class Channel(ModelCore):
     resource = models.CharField(
         max_length=255, choices=[(i, i) for i in settings.RESOURCE_LIST]
     )
-    outer_id = models.CharField(max_length=255)
+    outer_id = models.CharField(max_length=255, unique=True)
     status_on = models.BooleanField(default=True)
 
     class Meta:
@@ -46,19 +46,3 @@ class ChannelSettings(ModelCore):
 
     def __str__(self):
         return str(self.channel)
-
-
-class ChannelSettingsAllowedContentSource(ModelCore):
-    channel_settings = models.ForeignKey(
-        to=ChannelSettings, on_delete=models.CASCADE, related_name="allowed_content_sources"
-    )
-    value = models.CharField(
-        max_length=255, choices=[(i, i) for i in settings.CONTENT_SOURCE_LIST]
-    )
-
-    class Meta:
-        verbose_name = "Настройки канала - Разрешенный источник"
-        verbose_name_plural = "Настройки каналов - Разрешенные источники"
-
-    def __str__(self):
-        return str(self.channel_settings)

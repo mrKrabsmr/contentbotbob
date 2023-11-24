@@ -6,15 +6,17 @@ import (
 	"github.com/mrKrabsmr/contentbottelegram/internal/clients/redis"
 	"github.com/mrKrabsmr/contentbottelegram/internal/configs"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 type Bot struct {
-	config  *configs.Config
-	logger  *logrus.Logger
-	bot     *tgbotapi.BotAPI
-	redis   *redis.Client
-	api     *backend.APIClient
-	storage map[int64]State
+	config     *configs.Config
+	logger     *logrus.Logger
+	bot        *tgbotapi.BotAPI
+	redis      *redis.Client
+	api        *backend.APIClient
+	storage    map[int64]State
+	stopManage map[string]chan struct{}
 }
 
 func NewBot(config *configs.Config) (*Bot, error) {
@@ -26,12 +28,13 @@ func NewBot(config *configs.Config) (*Bot, error) {
 	logger := logrus.New()
 
 	return &Bot{
-		config:  config,
-		logger:  logger,
-		bot:     botAPI,
-		redis:   redis.NewClient(config.Redis),
-		api:     backend.NewAPIClient(config.Backend, logger),
-		storage: make(map[int64]State),
+		config:     config,
+		logger:     logger,
+		bot:        botAPI,
+		redis:      redis.NewClient(config.Redis),
+		api:        backend.NewAPIClient(config.Backend, logger),
+		storage:    make(map[int64]State),
+		stopManage: make(map[string]chan struct{}),
 	}, nil
 }
 
@@ -54,9 +57,37 @@ func (b *Bot) configure() error {
 	return nil
 }
 
+func (b *Bot) manageRun() error {
+	channels, err := b.api.ChannelList()
+	if err != nil {
+		return err
+	}
+
+	for _, channel := range channels {
+		chatId, err := b.redis.GetPostChatId(channel.OuterID)
+		if err != nil {
+			continue
+		}
+		
+		period, err := b.redis.GetPostPeriod(channel.OuterID)
+		if err != nil {
+			continue
+		}
+
+		go b.StartManage(channel.OuterID, chatId, period)
+	}
+
+	return nil
+}
+
 func (b *Bot) Run() error {
 	if err := b.configure(); err != nil {
 		return err
+	}
+
+	time.Sleep(time.Second * 5)
+	if err := b.manageRun(); err != nil {
+		b.logger.Error(err)
 	}
 
 	u := tgbotapi.NewUpdate(0)

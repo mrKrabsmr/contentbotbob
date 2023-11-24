@@ -1,16 +1,11 @@
 from django.contrib import admin
 
-from apps.channels.models import Channel, ChannelSettings, ChannelSettingsAllowedContentSource
-
-
-class ChannelSettingsAllowedContentSourceInline(admin.TabularInline):
-    model = ChannelSettingsAllowedContentSource
-    extra = 1
+from apps.channels.models import Channel, ChannelSettings
 
 
 @admin.register(ChannelSettings)
 class ChannelSettingsAdmin(admin.ModelAdmin):
-    inlines = (ChannelSettingsAllowedContentSourceInline,)
+    pass
 
 
 @admin.register(Channel)

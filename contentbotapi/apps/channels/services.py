@@ -1,4 +1,4 @@
-from apps.channels.models import Channel
+from apps.channels.models import Channel, ChannelSettings
 from apps.subscribes.services import UserSubscribeService as US_s
 
 
@@ -6,14 +6,30 @@ class ChannelService:
     _queryset = Channel.objects.all()
 
     @classmethod
+    def get_channels(cls, status_on=None):
+        if status_on is None:
+            return cls._queryset
+
+        if isinstance(status_on, bool):
+            return cls._queryset.filter(status_on=status_on)
+
+        return None
+
+    @classmethod
     def get_user_channels(cls, user):
         return cls._queryset.filter(owner=user)
 
     @classmethod
+    def get_by_outer_id(cls, outer_id):
+        return cls._queryset.filter(outer_id=outer_id).first()
+
+    @classmethod
     def get_filtered_channels_for_contents(cls, **kwargs):
         channels = cls._queryset.filter(
-            settings__allowed_content_sources__value=kwargs.get("source"),
+            type__in=kwargs.get("type"),
             settings__min_rating__lte=kwargs.get("rating")
+        ).exclude(
+            contents__text__istartswith=kwargs.get("text_part")
         )
 
         return channels
@@ -31,3 +47,13 @@ class ChannelService:
             return False
 
         return True
+
+
+class ChannelSettingsService:
+    _queryset = ChannelSettings.objects.all()
+
+    @classmethod
+    def get_by_channel_id(cls, outer_id):
+        channel = ChannelService.get_by_outer_id(outer_id)
+        settings = cls._queryset.filter(channel=channel).first()
+        return settings

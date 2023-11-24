@@ -79,5 +79,3 @@ class UserCodeActivation(ModelCore):
         verbose_name = "Код активации"
         verbose_name_plural = "Коды активации"
 
-    def save(*args, **kwargs):
-        pass

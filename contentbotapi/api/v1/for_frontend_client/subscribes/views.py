@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.subscribes.serializers import SubscribeSerializer
 from apps.subscribes.services import SubscribeService as S_s, UserSubscribeService as US_s
 from apps.users.permissions import IsConfirmed
 
@@ -12,7 +13,9 @@ class SubscribeAPIView(APIView):
     permission_classes = [IsAuthenticated, IsConfirmed]
 
     def get(self, request, *args, **kwargs):
-        return S_s.get_all()
+        subscribes = S_s.get_all()
+        serializer = SubscribeSerializer(subscribes, many=True)
+        return Response({"result": serializer.data}, http.HTTPStatus.OK)
 
     def post(self, request, *args, **kwargs):
         user = request.user

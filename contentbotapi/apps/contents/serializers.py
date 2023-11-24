@@ -6,15 +6,20 @@ from apps.contents.models import Content, ContentMedia
 
 class NewsContentSerializer(serializers.Serializer):
     text = serializers.CharField()
-    subject = serializers.CharField()
-    source = serializers.CharField()
-    img = serializers.CharField()
+    types = serializers.ListField(
+        child=serializers.CharField()
+    )
+    img = serializers.ListField(
+        child=serializers.CharField(required=False, allow_null=True, allow_blank=True),
+        required=False,
+        allow_null=True
+    )
 
 
 class ContentMediaSerializer(ModelSerializer):
     class Meta:
         model = ContentMedia
-        fields = "__all__"
+        exclude = ("content",)
 
 
 class ContentSerializer(ModelSerializer):
@@ -22,4 +27,4 @@ class ContentSerializer(ModelSerializer):
 
     class Meta:
         model = Content
-        fields = "__all__"
+        fields = ("id", "text", "images")

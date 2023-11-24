@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/mrKrabsmr/contentbottelegram/internal/configs"
 	"github.com/redis/go-redis/v9"
+	"strconv"
 	"time"
 )
 
@@ -90,11 +91,48 @@ func (c *Client) DeleteTokens(userId int64) error {
 	return nil
 }
 
-func (c *Client) SetPostFormat(chanId string, toChannel bool) error {
-	_, err := c.Set(context.Background(), chanId, toChannel, 0).Result()
+func (c *Client) SetPostChatId(chanId string, chatId int64) error {
+	_, err := c.Set(context.Background(), chanId+"f", chatId, 0).Result()
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (c *Client) SetPostPeriod(chanId string, period int) error {
+	_, err := c.Set(context.Background(), chanId+"p", period, 0).Result()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) GetPostChatId(chanId string) (int64, error) {
+	chatIdStr, err := c.Get(context.Background(), chanId+"f").Result()
+	if err != nil {
+		return -1, err
+	}
+
+	chatId, err := strconv.Atoi(chatIdStr)
+	if err != nil {
+		return -1, err
+	}
+
+	return int64(chatId), nil
+}
+
+func (c *Client) GetPostPeriod(chanId string) (int, error) {
+	period, err := c.Get(context.Background(), chanId+"p").Result()
+	if err != nil {
+		return -1, err
+	}
+
+	periodInt, err := strconv.Atoi(period)
+	if err != nil {
+		return -1, err
+	}
+
+	return periodInt, nil
 }

@@ -1,3 +1,5 @@
+import logging
+
 from django.db.transaction import atomic
 
 from apps.channels.services import ChannelService as Ch_s
@@ -8,7 +10,14 @@ class ContentService:
     _queryset = Content.objects.all()
 
     @classmethod
-    def get_suitable_one(cls, outer_id):
+    def get_suitable_one(cls, outer_id) -> (Content, bool):
+        channel = Ch_s.get_by_outer_id(outer_id)
+        if not channel:
+            return None, False
+
+        if not channel.status_on:
+            return None, False
+
         suitable_content = cls._queryset.select_related(
             "channel"
         ).prefetch_related(
@@ -19,7 +28,11 @@ class ContentService:
             "created_at"
         ).first()
 
-        return suitable_content
+        if suitable_content:
+            cls._queryset.filter(id=suitable_content.id).delete()
+            return suitable_content, True
+
+        return None, True
 
 
 class ContentDistributionService:
@@ -36,19 +49,30 @@ class ContentDistributionService:
 
         for channel in cls._filter_channels(data):
             content = Content(text=data["text"], rating=data["rating"], channel=channel)
-            content_image = ContentMedia(file_url=data["img"], channel_content=content)
+            imgs = data["img"]
+            if imgs:
+                for img in imgs:
+                    if img:
+                        content_image = ContentMedia(file_url=img, content=content)
+                        content_images.append(content_image)
 
             contents.append(content)
-            content_images.append(content_image)
 
         cls._queryset.bulk_create(contents)
         cls._media_queryset.bulk_create(content_images)
 
     @staticmethod
     def _filter_channels(data):
-        empty = False if data.get("img") else True
+        empty = True
+        imgs = data.get("img")
+        if imgs and len(imgs) > 0:
+            empty = False
 
-        channels = Ch_s.get_filtered_channels_for_contents(source=data.get("source"), rating=data.get("rating"))
+        channels = Ch_s.get_filtered_channels_for_contents(
+            type=data.get("types"),
+            rating=data.get("rating"),
+            text_part=data.get("text")[:50]
+        )
 
         if empty:
             channels = channels.filter(settings__empty_file_allowed=True)

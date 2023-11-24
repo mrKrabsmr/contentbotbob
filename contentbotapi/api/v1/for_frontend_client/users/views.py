@@ -1,4 +1,3 @@
-import datetime
 import http
 
 from rest_framework.permissions import IsAuthenticated
@@ -21,7 +20,7 @@ class RegisterAPIView(APIView):
 
         if serializer.is_valid():
             serializer.save()
-            UCA_s.create_or_change_activation_code(serializer.instance)
+            UCA_s.send_activation_code(serializer.instance)
 
             return Response({"message": text_messages["sent_email"]}, http.HTTPStatus.CREATED)
 
@@ -52,19 +51,25 @@ class SendActivateCodeAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        UCA_s.create_or_change_activation_code(request.user)
+        UCA_s.send_activation_code(request.user)
+        return Response({"result": "ok"}, http.HTTPStatus.OK)
 
 
 class UserActivateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
-        activation_code = UCA_s.get_object(request.data.get("code"))
+        if not UCA_s.check_user_have_code(request.user):
+            return Response({"message": "activation code not found"}, http.HTTPStatus.NOT_FOUND)
+
+        activation_code = UCA_s.get_object(request)
         if activation_code:
             activation_code.user.is_confirmed = True
             activation_code.user.save()
             activation_code.delete()
 
             return Response({"message": "success"}, http.HTTPStatus.OK)
-        return Response({"message": "activation code not found"}, http.HTTPStatus.NOT_FOUND)
+        return Response({"message": "invalid code"}, http.HTTPStatus.BAD_REQUEST)
 
 
 class ProfileAPIView(APIView):
@@ -75,6 +80,7 @@ class ProfileAPIView(APIView):
             "username": request.user.username,
             "email": request.user.email,
             "registered_at": request.user.date_joined.date(),
+            "is_confirmed": request.user.is_confirmed,
             "subscribe": None
         }
 

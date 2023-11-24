@@ -1,13 +1,11 @@
-FROM golang:1.21.3
+FROM python:3.10
 
 WORKDIR /pars
 
-COPY go.mod go.sum ./
+COPY requirements.txt ./
 
-RUN go mod download
+RUN pip install -r requirements.txt
 
 COPY . ./
 
 EXPOSE 8001
-
-
