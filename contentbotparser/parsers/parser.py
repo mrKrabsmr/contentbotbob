@@ -4,7 +4,9 @@ import aiohttp
 
 from parsers.animals import pars_gismeteoru
 from parsers.crypto import pars_investcom
+from parsers.cybersport import pars_cybersportru
 from parsers.films import pars_filmru
+from parsers.retails import pars_retailru
 from parsers.sport import pars_championatcom
 
 
@@ -20,15 +22,17 @@ class Parser:
             )
 
             await asyncio.gather(
-                pars_filmru(session=session, api=self.api, timeout=60 * 60 * 24),
-                pars_gismeteoru(session=session, api=self.api, timeout=60*60*5),
-                pars_investcom(session=session, api=self.api, timeout=60*60),
-                pars_championatcom(session=session, api=self.api, kind="football", timeout=60 * 30),
-                pars_championatcom(session=session, api=self.api, kind="hockey", timeout=60 * 60 * 2),
-                pars_championatcom(session=session, api=self.api, kind="tennis", timeout=60 * 60 * 3),
-                pars_championatcom(session=session, api=self.api, kind="boxing", timeout=60 * 60 * 2),
-                pars_championatcom(session=session, api=self.api, kind="basketball", timeout=60 * 60 * 2),
-                pars_championatcom(session=session, api=self.api, kind="auto", timeout=60 * 60),
-                pars_championatcom(session=session, api=self.api, kind="volleyball", timeout=60 * 60 * 24),
-                pars_championatcom(session=session, api=self.api, kind="figureskating", timeout=60 * 60 * 3),
+                pars_retailru(session=session, api=self.api, timeout=60*60*5),
+                # pars_cybersportru(session=session, api=self.api, timeout=60 * 60 * 5),
+                # pars_filmru(session=session, api=self.api, timeout=60 * 60 * 24),
+                # pars_gismeteoru(session=session, api=self.api, timeout=60 * 60 * 5),
+                # pars_investcom(session=session, api=self.api, timeout=60 * 60),
+                # pars_championatcom(session=session, api=self.api, kind="football", timeout=60 * 30),
+                # pars_championatcom(session=session, api=self.api, kind="hockey", timeout=60 * 60 * 2),
+                # pars_championatcom(session=session, api=self.api, kind="tennis", timeout=60 * 60 * 3),
+                # pars_championatcom(session=session, api=self.api, kind="boxing", timeout=60 * 60 * 2),
+                # pars_championatcom(session=session, api=self.api, kind="basketball", timeout=60 * 60 * 2),
+                # pars_championatcom(session=session, api=self.api, kind="auto", timeout=60 * 60),
+                # pars_championatcom(session=session, api=self.api, kind="volleyball", timeout=60 * 60 * 24),
+                # pars_championatcom(session=session, api=self.api, kind="figureskating", timeout=60 * 60 * 3),
             )

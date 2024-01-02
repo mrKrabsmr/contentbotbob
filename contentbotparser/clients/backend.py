@@ -1,5 +1,4 @@
 import http
-import json
 import logging
 
 import aiohttp
@@ -16,5 +15,6 @@ class APIClient:
             if resp.status != http.HTTPStatus.CREATED:
                 data = await resp.json()
                 logging.error(data)
+
 
 

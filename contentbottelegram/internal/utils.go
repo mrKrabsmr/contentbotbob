@@ -52,7 +52,7 @@ LOOP:
 			if err != nil {
 				b.logger.Error("Ошибка при попытке ведения канала ", err)
 			} else if !ok {
-				break
+				break LOOP
 			} else {
 				if len(resp.Result.Images) > 0 {
 					var mediaGroup []interface{}

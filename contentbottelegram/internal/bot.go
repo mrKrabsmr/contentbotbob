@@ -68,7 +68,7 @@ func (b *Bot) manageRun() error {
 		if err != nil {
 			continue
 		}
-		
+
 		period, err := b.redis.GetPostPeriod(channel.OuterID)
 		if err != nil {
 			continue

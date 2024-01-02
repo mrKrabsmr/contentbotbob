@@ -133,6 +133,7 @@ CHANNEL_TYPE_LIST = [
     "crypto",
     "films",
     "animals",
+    "cybersport",
     "sport",
     "football",
     "basketball",

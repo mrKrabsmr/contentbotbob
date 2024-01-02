@@ -15,6 +15,10 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 				return
 			}
 
+			if update.Message == nil && update.CallbackQuery == nil {
+				return
+			}
+
 			handling, context := b.Middleware(&update, b.JWTAuthentication)
 			if !handling {
 				return
