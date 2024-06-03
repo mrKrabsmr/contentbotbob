@@ -379,7 +379,7 @@ func (b *Bot) handleSubscribes(message *tgbotapi.Message, access string) {
 	}
 
 	for _, sub := range resp.Result {
-		invoice := txtSubscribe(message, sub, "381764678:TEST:71597")
+		invoice := txtSubscribe(message, sub, b.config.ProviderToken)
 		_, err = b.bot.Send(invoice)
 		if err != nil {
 			b.SendErrorMsg(message, "")

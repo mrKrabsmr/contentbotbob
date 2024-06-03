@@ -25,7 +25,7 @@ class ContentService:
         ).filter(
             channel__outer_id=outer_id
         ).order_by(
-            "created_at"
+            "-rating"
         ).first()
 
         if suitable_content:
@@ -48,12 +48,14 @@ class ContentDistributionService:
         content_images = []
 
         for channel in cls._filter_channels(data):
-            content = Content(text=data["text"], rating=data["rating"], channel=channel)
+            content = Content(text=data["text"],
+                              rating=data["rating"], channel=channel)
             imgs = data["img"]
             if imgs:
                 for img in imgs:
                     if img:
-                        content_image = ContentMedia(file_url=img, content=content)
+                        content_image = ContentMedia(
+                            file_url=img, content=content)
                         content_images.append(content_image)
 
             contents.append(content)

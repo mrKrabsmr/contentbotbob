@@ -52,7 +52,7 @@ async def pars_championatcom(session: aiohttp.ClientSession, api: APIClient, kin
 
                     txt = info_head.text + "\n\n"
                     for i in info_body.find_all("p"):
-                        txt += i.text
+                        txt += i.text + "\n\n"
 
                     img = None
                     if len(info_img) != 0:

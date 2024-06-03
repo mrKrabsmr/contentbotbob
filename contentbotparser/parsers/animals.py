@@ -40,7 +40,7 @@ async def pars_gismeteoru(session: aiohttp.ClientSession, api: APIClient, timeou
 
                     txt = info_head.text + "\n\n"
                     for i in info_body.find_all("p"):
-                        txt += i.text
+                        txt += i.text + "\n\n"
 
                     img = list()
                     for i in info_body.find_all("figure"):

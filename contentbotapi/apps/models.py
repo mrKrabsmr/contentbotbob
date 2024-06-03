@@ -15,3 +15,10 @@ class ModelCore(models.Model):
 
     class Meta:
         abstract = True
+
+
+
+
+
+
+

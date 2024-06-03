@@ -3,11 +3,12 @@ from django.contrib import admin
 from apps.channels.models import Channel, ChannelSettings
 
 
-@admin.register(ChannelSettings)
-class ChannelSettingsAdmin(admin.ModelAdmin):
-    pass
+class ChannelSettingsInline(admin.TabularInline):
+    model = ChannelSettings
+    extra = 1
 
 
 @admin.register(Channel)
 class ChannelAdmin(admin.ModelAdmin):
-    pass
+    inlines = [ChannelSettingsInline]
+    list_display = ["owner", "name", "type", "resource", "status_on"]

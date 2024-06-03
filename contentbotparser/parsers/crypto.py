@@ -35,7 +35,7 @@ async def pars_investcom(session: aiohttp.ClientSession, api: APIClient, timeout
 
                     plain_txt = ""
                     for i in info.find_all("p"):
-                        plain_txt += i.text
+                        plain_txt += i.text + "\n\n"
 
                     txt = info.parent.find("h1").text + "\n\n" + plain_txt.replace(
                         "Happycoin.club - ", ""

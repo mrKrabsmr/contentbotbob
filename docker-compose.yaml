@@ -57,6 +57,19 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+  worker:
+    build:
+        context: ./contentbotapi/
+    container_name: worker
+    restart: always
+    entrypoint: celery
+    command: -A apps.celery_app.app worker --loglevel=info
+    links:
+        - redis
+    depends_on:
+        - redis
+    volumes:
+        - .:/app
 
 volumes:
   redis_data: {}

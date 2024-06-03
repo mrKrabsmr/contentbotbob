@@ -18,6 +18,9 @@ class Subscribe(models.Model):
         verbose_name = "подписка"
         verbose_name_plural = "подписки"
 
+    def __str__(self):
+        return self.name
+
 
 class UserSubscribe(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -30,4 +33,3 @@ class UserSubscribe(models.Model):
         verbose_name = "подписка пользователя"
         verbose_name_plural = "подписки пользователей"
         ordering = ("-bought_at",)
-

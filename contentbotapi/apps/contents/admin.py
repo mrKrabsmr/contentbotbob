@@ -9,5 +9,7 @@ class ContentMediaInline(admin.TabularInline):
 
 
 @admin.register(Content)
-class CotentAdmin(admin.ModelAdmin):
+class ContentAdmin(admin.ModelAdmin):
     inlines = (ContentMediaInline,)
+    list_display = ["channel", "rating", "created_at"]
+

@@ -59,7 +59,7 @@ async def pars_filmru(session: aiohttp.ClientSession, api: APIClient, timeout: i
                     info_body = soup.select(".wrapper_articles_text")[0]
                     plain_txt = ""
                     for i in info_body.find_all("p"):
-                        plain_txt += i.text
+                        plain_txt += i.text + "\n\n"
 
                     txt = info_head.text + "\n\n" + plain_txt.split("Источник: ")[0]
 
