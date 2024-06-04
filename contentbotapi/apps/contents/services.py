@@ -1,8 +1,11 @@
+import datetime
 import logging
 
 from django.db.transaction import atomic
+from django.db.models import F
 
 from apps.channels.services import ChannelService as Ch_s
+from apps.channels.services import ChannelSettingsService as ChS_s
 from apps.contents.models import Content, ContentMedia
 
 
@@ -18,18 +21,26 @@ class ContentService:
         if not channel.status_on:
             return None, False
 
+        delta = datetime.datetime.now() - datetime.timedelta(days=ChS_s.get_by_channel_id(outer_id).not_later_days)
+        cls._queryset.filter(
+            channel__outer_id=outer_id, 
+            created_at__lt=delta
+        ).delete()
+
         suitable_content = cls._queryset.select_related(
             "channel"
         ).prefetch_related(
             "images"
         ).filter(
-            channel__outer_id=outer_id
+            channel__outer_id=outer_id,
+            was_sent=False
         ).order_by(
             "-rating"
         ).first()
 
         if suitable_content:
-            cls._queryset.filter(id=suitable_content.id).delete()
+            suitable_content.was_sent = True
+            suitable_content.save()
             return suitable_content, True
 
         return None, True

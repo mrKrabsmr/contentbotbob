@@ -15,6 +15,7 @@ class Content(ModelCore):
         null=True, blank=True, choices=[(i, i) for i in range(1, 11)]
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    was_sent = models.BooleanField(default=False)
 
     class Meta:
         db_table = "channel_contents"
