@@ -40,15 +40,23 @@ async def pars_investcom(session: aiohttp.ClientSession, api: APIClient, timeout
                         except Exception:
                             continue
 
-                    txt = soup.find("h1").text + "\n\n" + plain_txt.replace(
+                    plain_txt = soup.find("h1").text + "\n\n" + plain_txt.replace(
                         "Happycoin.club - ", ""
                     ).split(
                         "Позиция успешно добавлена:"
                     )[0].split(
                         "Источник: "
                     )[0].split(
-                        "Читайте оригинальную статью на сайте Happycoin.club"
+                        "Читайте оригинальную статью на сайте"
                     )[0].strip()
+                    
+                    txt = ""
+                    for char in plain_txt:
+                        if char == "\n":
+                            if txt[-2:] != "\n\n":
+                                txt += char
+                        else:
+                            txt += char
 
                     img = soup.select("#__next > div.md\:relative.md\:bg-white > div.relative.flex > div.grid.flex-1.grid-cols-1.px-4.pt-5.font-sans-v2.text-\[\#232526\].antialiased.xl\:container.sm\:px-6.md\:grid-cols-\[1fr_72px\].md\:gap-6.md\:px-7.md\:pt-10.md2\:grid-cols-\[1fr_420px\].md2\:gap-8.md2\:px-8.xl\:mx-auto.xl\:gap-10.xl\:px-10 > div.min-w-0 > div > div:nth-child(1) > div.relative.flex.flex-col > div.mb-5.mt-4.sm\:mt-8.md\:mb-8.relative.h-\[294px\].w-full.overflow-hidden.bg-\[\#181C21\].sm\:h-\[420px\].xl\:h-\[441px\] > img")[0].attrs["src"]
                     if text_validator(txt, img is not None):
@@ -60,9 +68,9 @@ async def pars_investcom(session: aiohttp.ClientSession, api: APIClient, timeout
 
                         contents.append(data)
 
-            except Exception as e:
-                logging.info(e)
-        logging.info(contents)
+            except Exception:
+                pass
+
         await api.send_content(contents)
         await asyncio.sleep(timeout)
 

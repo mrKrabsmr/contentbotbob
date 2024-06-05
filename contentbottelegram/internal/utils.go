@@ -56,7 +56,7 @@ LOOP:
 			} else {
 				if len(resp.Result.Images) > 0 {
 					var mediaGroup []interface{}
-
+                    
 					wasAddedText := false
 					for _, image := range resp.Result.Images {
 						inputMediaPhoto := tgbotapi.NewInputMediaPhoto(tgbotapi.FileURL(image.FileUrl))
@@ -69,10 +69,16 @@ LOOP:
 					}
 
 					msgGroup := tgbotapi.NewMediaGroup(chatId, mediaGroup)
-					_, _ = b.bot.SendMediaGroup(msgGroup)
+					_, err = b.bot.SendMediaGroup(msgGroup)
+                    if err != nil {
+                        b.logger.Error(err)
+                    }
 				} else {
 					msgTxt := tgbotapi.NewMessage(chatId, resp.Result.Text)
-					_, _ = b.bot.Send(msgTxt)
+					_, err = b.bot.Send(msgTxt)
+                    if err != nil {
+                        b.logger.Error(err)
+                    }
 				}
 			}
 		}

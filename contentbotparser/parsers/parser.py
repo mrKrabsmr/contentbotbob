@@ -22,7 +22,7 @@ class Parser:
             )
 
             await asyncio.gather(
-                pars_retailru(session=session, api=self.api, timeout=60*60*5),
+                pars_retailru(session=session, api=self.api, timeout=60*60*24),
                 pars_cybersportru(session=session, api=self.api, timeout=60 * 60 * 5),
                 pars_filmru(session=session, api=self.api, timeout=60 * 60 * 24),
                 pars_gismeteoru(session=session, api=self.api, timeout=60 * 60 * 5),

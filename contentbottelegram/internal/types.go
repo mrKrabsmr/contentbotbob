@@ -126,6 +126,7 @@ var useChanTypes = []string{
 	"crypto",
 	"films",
 	"animals",
+    "retails",
 	"cybersport",
 	"sport",
 	"football",
