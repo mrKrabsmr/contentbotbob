@@ -58,7 +58,7 @@ async def pars_championatcom(session: aiohttp.ClientSession, api: APIClient, kin
                         txt += i.text + "\n\n"
                     
                     if txt[-1] == ":":
-                        txt = "\n".join(txt.split("\n")[-1:])
+                        txt = "\n".join(txt.split("\n")[:-1])
 
                     img = None
                     if len(info_img) != 0:
